@@ -13,6 +13,7 @@
     "@my-better-t-app/db": "*",
     "@my-better-t-app/env": "*",
     "dotenv": "^17.2.2",
+    "drizzle-orm": "^0.45.1",
     "hono": "^4.8.2",
     "zod": "^4.1.13"
   },

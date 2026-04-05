@@ -24,8 +24,12 @@
     "fix": "ultracite fix"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1024.0",
+    "@aws-sdk/s3-request-presigner": "^3.1024.0",
     "@my-better-t-app/env": "*",
     "dotenv": "^17.2.2",
+    "ioredis": "^5.10.1",
+    "openai": "^6.33.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {

@@ -8,3 +8,6 @@ export function createDb() {
 }
 
 export const db = createDb();
+
+// Re-export schema types
+export * from "./schema";
