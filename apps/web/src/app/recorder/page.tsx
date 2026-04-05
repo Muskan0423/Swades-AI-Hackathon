@@ -151,23 +151,35 @@ function ChunkRow({ chunk, index }: { chunk: WavChunk; index: number }) {
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-sm border border-border/50 bg-muted/30 px-3 py-2">
+    <div className="flex items-center justify-between gap-3 rounded-sm border border-border/50 bg-muted/30 px-3 py-3 hover:bg-muted/50 transition-colors">
       <audio
         ref={audioRef}
         src={chunk.url}
         onEnded={() => setPlaying(false)}
         preload="none"
       />
-      <span className="text-xs font-medium text-muted-foreground tabular-nums">
+      <span className="text-xs font-medium text-muted-foreground tabular-nums min-w-0">
         #{index + 1}
       </span>
-      <span className="text-xs tabular-nums">{formatDuration(chunk.duration)}</span>
+      <span className="text-xs tabular-nums text-muted-foreground">
+        {formatDuration(chunk.duration)}
+      </span>
       <UploadStatusBadge status={chunk.uploadStatus} />
       <div className="ml-auto flex gap-1">
-        <Button variant="ghost" size="icon-xs" onClick={toggle}>
+        <Button 
+          variant="ghost" 
+          size="icon-xs" 
+          onClick={toggle}
+          title={playing ? "Stop playback" : "Play chunk"}
+        >
           {playing ? <Square className="size-3" /> : <Play className="size-3" />}
         </Button>
-        <Button variant="ghost" size="icon-xs" onClick={download}>
+        <Button 
+          variant="ghost" 
+          size="icon-xs" 
+          onClick={download}
+          title="Download chunk"
+        >
           <Download className="size-3" />
         </Button>
       </div>
@@ -190,23 +202,23 @@ function TranscriptChunkItem({
   }
 
   return (
-    <div className="border-b border-border/50 pb-2 last:border-0">
-      <div className="flex items-center justify-between mb-1">
+    <div className="border-b border-border/50 pb-3 last:border-0 px-2 py-1 rounded-sm">
+      <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-medium text-muted-foreground">
           Chunk #{chunk.index + 1}
         </span>
         <div className="flex items-center gap-2">
           {chunk.language && chunk.status === "completed" && (
-            <span className="text-[10px] text-muted-foreground uppercase">
+            <span className="text-[10px] text-muted-foreground uppercase px-1.5 py-0.5 bg-muted rounded">
               {chunk.language}
             </span>
           )}
           {chunk.confidence !== null && chunk.status === "completed" && (
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[10px] text-muted-foreground px-1.5 py-0.5 bg-muted rounded">
               {chunk.confidence}%
             </span>
           )}
-          <span className={`text-[10px] ${statusColors[chunk.status] || ""}`}>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${statusColors[chunk.status] || ""} bg-background/80`}>
             {chunk.status === "processing" && (
               <Loader2 className="inline size-3 animate-spin mr-1" />
             )}
@@ -218,6 +230,7 @@ function TranscriptChunkItem({
               size="icon-xs"
               onClick={() => onRetry(chunk.index)}
               title="Retry transcription"
+              className="h-5 w-5"
             >
               <RefreshCw className="size-3" />
             </Button>
@@ -225,11 +238,14 @@ function TranscriptChunkItem({
         </div>
       </div>
       {chunk.transcript ? (
-        <p className="text-sm">{chunk.transcript}</p>
+        <p className="text-sm leading-relaxed">{chunk.transcript}</p>
       ) : chunk.status === "pending" ? (
         <p className="text-sm text-muted-foreground italic">Waiting for transcription...</p>
       ) : chunk.status === "processing" ? (
-        <p className="text-sm text-muted-foreground italic">Transcribing...</p>
+        <p className="text-sm text-muted-foreground italic flex items-center gap-2">
+          <Loader2 className="size-3 animate-spin" />
+          Transcribing...
+        </p>
       ) : (
         <p className="text-sm text-muted-foreground italic">No transcript</p>
       )}
@@ -360,7 +376,7 @@ function TranscriptPanel({
 
   return (
     <Card className="w-full">
-      <CardHeader>
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
@@ -370,7 +386,7 @@ function TranscriptPanel({
             <CardDescription>
               {completedCount} of {transcript?.chunks.length || 0} chunks transcribed
               {pendingCount > 0 && (
-                <span className="text-blue-500 ml-2">
+                <span className="text-blue-600 dark:text-blue-400 ml-2 font-medium">
                   ({pendingCount} in progress)
                 </span>
               )}
@@ -378,18 +394,28 @@ function TranscriptPanel({
           </div>
           {transcript?.full && (
             <div className="flex gap-1">
-              <Button variant="ghost" size="sm" onClick={copyToClipboard}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={copyToClipboard}
+                className="gap-1.5"
+              >
                 Copy
               </Button>
-              <Button variant="ghost" size="sm" onClick={downloadTranscript}>
-                <Download className="size-3 mr-1" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={downloadTranscript}
+                className="gap-1.5"
+              >
+                <Download className="size-3" />
                 Download
               </Button>
             </div>
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         {loading && !transcript && (
           <div className="flex items-center justify-center py-4">
             <Loader2 className="size-5 animate-spin text-muted-foreground" />
@@ -401,20 +427,23 @@ function TranscriptPanel({
         )}
 
         {transcript && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {/* Full transcript */}
             {transcript.full && (
-              <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
-                <p className="text-sm whitespace-pre-wrap">{transcript.full}</p>
+              <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
+                <p className="text-sm whitespace-pre-wrap leading-relaxed">{transcript.full}</p>
               </div>
             )}
 
             {/* Individual chunks */}
             <details className="group">
-              <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+              <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 transition-colors">
+                <svg className="w-4 h-4 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
                 View by chunk ({transcript.chunks.length})
               </summary>
-              <div className="mt-2 space-y-2 pl-2 border-l-2 border-border/50">
+              <div className="mt-3 space-y-3 pl-6 border-l-2 border-border/50">
                 {transcript.chunks.map((chunk) => (
                   <TranscriptChunkItem 
                     key={chunk.index} 
@@ -471,22 +500,24 @@ export default function RecorderPage() {
   }, [isActive, stop, start])
 
   return (
-    <div className="container mx-auto flex max-w-lg flex-col items-center gap-6 px-4 py-8">
+    <div className="container mx-auto flex max-w-2xl flex-col items-center gap-8 px-4 py-8">
       <Card className="w-full">
-        <CardHeader>
+        <CardHeader className="pb-4">
           <div className="flex items-start justify-between">
             <div>
-              <CardTitle>Recorder</CardTitle>
-              <CardDescription>16 kHz / 16-bit PCM WAV — chunked every 5 s</CardDescription>
+              <CardTitle className="text-xl">Audio Recorder</CardTitle>
+              <CardDescription className="mt-1">
+                16 kHz / 16-bit PCM WAV — chunked every 5 seconds
+              </CardDescription>
             </div>
             <div className="flex items-center gap-2">
               {opfsSupported ? (
-                <span className="flex items-center gap-1 text-[10px] text-green-600">
+                <span className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 px-2 py-1 bg-green-50 dark:bg-green-950/20 rounded-full">
                   <HardDrive className="size-3" />
                   OPFS
                 </span>
               ) : (
-                <span className="flex items-center gap-1 text-[10px] text-amber-500">
+                <span className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 px-2 py-1 bg-amber-50 dark:bg-amber-950/20 rounded-full">
                   <CloudOff className="size-3" />
                   No OPFS
                 </span>
@@ -495,17 +526,17 @@ export default function RecorderPage() {
           </div>
         </CardHeader>
 
-        <CardContent className="flex flex-col gap-6">
+        <CardContent className="flex flex-col gap-8">
           {/* Waveform */}
-          <div className="overflow-hidden rounded-sm border border-border/50 bg-muted/20 text-foreground">
+          <div className="overflow-hidden rounded-lg border border-border/50 bg-muted/20 p-4">
             <LiveWaveform
               active={isRecording}
               processing={isPaused}
               stream={stream}
-              height={80}
-              barWidth={3}
-              barGap={1}
-              barRadius={2}
+              height={100}
+              barWidth={4}
+              barGap={2}
+              barRadius={3}
               sensitivity={1.8}
               smoothingTimeConstant={0.85}
               fadeEdges
@@ -515,29 +546,34 @@ export default function RecorderPage() {
           </div>
 
           {/* Timer */}
-          <div className="text-center font-mono text-3xl tabular-nums tracking-tight">
-            {formatTime(elapsed)}
+          <div className="text-center">
+            <div className="font-mono text-4xl tabular-nums tracking-tight mb-1">
+              {formatTime(elapsed)}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {isRecording ? "Recording..." : isPaused ? "Paused" : "Ready to record"}
+            </div>
           </div>
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-4">
             {/* Record / Stop */}
             <Button
               size="lg"
               variant={isActive ? "destructive" : "default"}
-              className="gap-2 px-5"
+              className="gap-3 px-6 py-3 text-base font-medium"
               onClick={handlePrimary}
               disabled={status === "requesting"}
             >
               {isActive ? (
                 <>
-                  <Square className="size-4" />
-                  Stop
+                  <Square className="size-5" />
+                  Stop Recording
                 </>
               ) : (
                 <>
-                  <Mic className="size-4" />
-                  {status === "requesting" ? "Requesting..." : "Record"}
+                  <Mic className="size-5" />
+                  {status === "requesting" ? "Requesting..." : "Start Recording"}
                 </>
               )}
             </Button>
@@ -547,17 +583,17 @@ export default function RecorderPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="gap-2"
+                className="gap-3 px-6 py-3 text-base"
                 onClick={isPaused ? resume : pause}
               >
                 {isPaused ? (
                   <>
-                    <Play className="size-4" />
+                    <Play className="size-5" />
                     Resume
                   </>
                 ) : (
                   <>
-                    <Pause className="size-4" />
+                    <Pause className="size-5" />
                     Pause
                   </>
                 )}

@@ -139,36 +139,43 @@ function SettingsPanel() {
   };
 
   return (
-    <section className="rounded-lg border p-4 border-dashed border-yellow-500/50 bg-yellow-500/5">
-      <div className="flex items-center gap-2 mb-4">
-        <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        <h2 className="font-semibold text-lg">Settings</h2>
+    <section className="rounded-lg border p-6 border-dashed border-yellow-500/50 bg-yellow-500/5">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-500/20">
+          <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
+        <div>
+          <h2 className="font-semibold text-lg">OpenAI API Configuration</h2>
+          <p className="text-sm text-muted-foreground">Required for audio transcription</p>
+        </div>
       </div>
 
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            OpenAI API Key
-            <span className="text-muted-foreground font-normal ml-2">(for Whisper transcription)</span>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">
+            API Key
+            <span className="text-muted-foreground font-normal ml-2">(starts with sk-...)</span>
           </label>
           
           {savedKey ? (
             <div className="flex items-center gap-2">
-              <div className="flex-1 px-3 py-2 bg-muted rounded border text-sm font-mono">
+              <div className="flex-1 px-3 py-2 bg-muted rounded-md border text-sm font-mono">
                 {showKey ? savedKey : maskApiKey(savedKey)}
               </div>
               <button
                 onClick={() => setShowKey(!showKey)}
-                className="px-3 py-2 text-sm border rounded hover:bg-muted"
+                className="px-3 py-2 text-sm border rounded-md hover:bg-muted transition-colors"
+                title={showKey ? "Hide API key" : "Show API key"}
               >
                 {showKey ? "Hide" : "Show"}
               </button>
               <button
                 onClick={handleClear}
-                className="px-3 py-2 text-sm border border-red-500/50 text-red-400 rounded hover:bg-red-500/10"
+                className="px-3 py-2 text-sm border border-red-500/50 text-red-600 rounded-md hover:bg-red-500/10 transition-colors"
+                title="Remove API key"
               >
                 Remove
               </button>
@@ -180,50 +187,73 @@ function SettingsPanel() {
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder="sk-..."
-                className="flex-1 px-3 py-2 bg-background border rounded text-sm font-mono"
+                className="flex-1 px-3 py-2 bg-background border rounded-md text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors"
               />
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
               >
                 {saving ? "Saving..." : "Save"}
               </button>
             </div>
           )}
-          
-          <p className="text-xs text-muted-foreground mt-2">
-            Get your API key from{" "}
+        </div>
+
+        {message && (
+          <div className={`px-4 py-3 rounded-md text-sm border ${
+            message.type === "success" 
+              ? "bg-green-500/10 text-green-700 border-green-500/20 dark:bg-green-500/20 dark:text-green-400" 
+              : "bg-red-500/10 text-red-700 border-red-500/20 dark:bg-red-500/20 dark:text-red-400"
+          }`}>
+            <div className="flex items-center gap-2">
+              {message.type === "success" ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              {message.text}
+            </div>
+          </div>
+        )}
+
+        <div className="pt-4 border-t border-yellow-500/20">
+          <h3 className="text-sm font-medium mb-2">How it works</h3>
+          <ol className="text-sm text-muted-foreground space-y-1">
+            <li className="flex items-start gap-2">
+              <span className="text-yellow-600 font-medium">1.</span>
+              <span>Record audio on the Recorder page</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-yellow-600 font-medium">2.</span>
+              <span>Each 5-second chunk is automatically uploaded</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-yellow-600 font-medium">3.</span>
+              <span>With an API key, chunks are transcribed using OpenAI Whisper</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-yellow-600 font-medium">4.</span>
+              <span>View transcripts in real-time as they complete</span>
+            </li>
+          </ol>
+          <div className="mt-3 pt-3 border-t border-yellow-500/20">
             <a 
               href="https://platform.openai.com/api-keys" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-blue-400 hover:underline"
+              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
             >
-              platform.openai.com/api-keys
+              Get your API key at platform.openai.com
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </a>
-            . Your key is encrypted and stored locally in your browser.
-          </p>
-        </div>
-
-        {message && (
-          <div className={`px-3 py-2 rounded text-sm ${
-            message.type === "success" 
-              ? "bg-green-500/20 text-green-400 border border-green-500/30" 
-              : "bg-red-500/20 text-red-400 border border-red-500/30"
-          }`}>
-            {message.text}
           </div>
-        )}
-
-        <div className="pt-4 border-t">
-          <h3 className="text-sm font-medium mb-2">How Transcription Works</h3>
-          <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
-            <li>Record audio on the Recorder page</li>
-            <li>Each 5-second chunk is automatically uploaded</li>
-            <li>With an API key, chunks are transcribed using OpenAI Whisper</li>
-            <li>View transcripts in real-time as they complete</li>
-          </ol>
         </div>
       </div>
     </section>
